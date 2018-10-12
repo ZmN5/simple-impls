@@ -5,6 +5,9 @@ SERVER_PORT = 8888
 SERVER_NAME = socket.getfqdn(SERVER_HOST)
 SERVER_TYPE = "coroutine"  # "process"
 
-REQUEST_QUEUE_SIZE = 10
+SERVER = 'coroutine_server.WSGIServerByCoroutine'
+# SERVER = 'process_server.WSGIServerByProcess'
+
+REQUEST_QUEUE_SIZE = 1024
 
 URL_SCHEME = 'http'

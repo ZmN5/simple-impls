@@ -2,14 +2,17 @@ import sys
 from importlib import import_module
 
 import config
+from utils import import_spec_object
 from process_server import WSGIServerByProcess
+from coroutine_server import WSGIServerByCoroutine
 
 SERVER_ADDRESS = (config.SERVER_HOST, config.SERVER_PORT)
 
 
 def make_server(server_address, application):
-    WSGIServerByProcess.pre_action()
-    server = WSGIServerByProcess(server_address)
+    WSGIServer = import_spec_object(config.SERVER)
+    WSGIServer.pre_action()
+    server = WSGIServer(server_address)
     server.set_app(application)
     return server
 

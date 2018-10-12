@@ -2,9 +2,9 @@ import os
 import socket
 import signal
 
+import config
 from app_params import AppParams
 from server import WSGIServer
-import config
 
 
 def grim_reaper(signum, frame):
