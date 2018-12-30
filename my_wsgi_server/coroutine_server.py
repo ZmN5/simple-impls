@@ -1,5 +1,4 @@
 import socket
-import select
 
 import config
 from app_params import AppParams
@@ -15,7 +14,7 @@ class WSGIServerByCoroutine(WSGIServer):
         self.sock = sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind(server_address)
-        sock.setblocking(0)
+        sock.setblocking(False)
         sock.listen(config.REQUEST_QUEUE_SIZE)
         self.scheduler = Scheduler()
 
@@ -31,9 +30,13 @@ class WSGIServerByCoroutine(WSGIServer):
         self.scheduler.mainloop()
 
     def handle_request(self, client, addr):
-        yield ReadWait(client)
-        request_data = client.recv(1 << 30)
-        app_params = AppParams(request_data)
+        request = b''
+        chunk = client.recv(4096)
+        while chunk:
+            request += chunk
+            yield ReadWait(client)
+            chunk = client.recv(4096)
+        app_params = AppParams(request)
         app_params.parse_request()
         env = app_params.get_environ()
         result = self.application(env, app_params.start_response)
